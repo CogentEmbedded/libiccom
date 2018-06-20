@@ -5,6 +5,7 @@ CFLAGS += -g -Wall -I./public
 
 SRCDIR   = src
 OBJDIR   = $(SRCDIR)
+TESTDIR  = test
 OUTDIR   = out
 SRCS     = $(SRCDIR)/iccom_library.c
 OBJS     = $(OBJDIR)/iccom_library.o
@@ -12,6 +13,8 @@ LIBNAME  = libiccom.so
 SONAME   = $(LIBNAME).$(MAJOR_VERSION)
 REALNAME = $(SONAME).$(MINOR_VERSION)
 TARGET   = $(OUTDIR)/$(REALNAME)
+TESTSRC  = $(TESTDIR)/test.c
+TEST     = $(OUTDIR)/iccom-test
 LOGLEVEL ?= LOGERR
 
 ifeq ($(LOGLEVEL),LOGERR)
@@ -23,6 +26,8 @@ else ifeq ($(LOGLEVEL),LOGDBG)
 else #ifeq ($(LOGLEVEL),LOGNONE)
 endif
 
+all : $(TARGET) $(TEST)
+
 $(TARGET) : $(OBJS)
 	@mkdir -p $(OUTDIR)
 	$(CC) -shared -Wl,-soname=$(SONAME) -o $@ $< -pthread
@@ -31,7 +36,10 @@ $(OBJS): $(SRCS)
 	@[ -d $(OBJDIR) ]
 	$(CC) $(CFLAGS) -fPIC -o $@ -c $<
 
+$(TEST) : $(TESTSRC) $(TARGET)
+	$(CC) $(CFLAGS) $(TESTSRC) $(TARGET) -o $@
+
 .PHONY: clean
 clean :
 	rm -f $(OBJS)
-	rm -f $(OUTDIR)/$(REALNAME)
+	rm -rf $(OUTDIR)

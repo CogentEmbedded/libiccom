@@ -30,14 +30,14 @@ all : $(TARGET) $(TEST)
 
 $(TARGET) : $(OBJS)
 	@mkdir -p $(OUTDIR)
-	$(CC) -shared -Wl,-soname=$(SONAME) -o $@ $< -pthread
+	$(CC) $(LDFLAGS) -shared -Wl,-soname=$(SONAME) -o $@ $< -pthread
 
 $(OBJS): $(SRCS)
 	@[ -d $(OBJDIR) ]
 	$(CC) $(CFLAGS) -fPIC -o $@ -c $<
 
 $(TEST) : $(TESTSRC) $(TARGET)
-	$(CC) $(CFLAGS) $(TESTSRC) $(TARGET) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(TESTSRC) $(TARGET) -o $@
 
 .PHONY: clean
 clean :
